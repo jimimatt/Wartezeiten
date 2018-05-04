@@ -13,9 +13,10 @@ public class Zeitmodell {
 	private int patientenAnzahl;
 	private int[] termine;
 	private int[] dauer;
+	private int anzahlPermutationen;
 	
-	private int wzKumulativ = 0; /* wird in berechneModell() durch die Anzahl der Patienten geteilt */
-	private int mwzKumulativ = 0;
+	private long wzKumulativ = 0; /* wird in berechneModell() durch die Anzahl der Patienten geteilt */
+	private long mwzKumulativ = 0;
 	private int leerKumulativ = 0;
 	
 	private double wz = 0.;
@@ -29,20 +30,21 @@ public class Zeitmodell {
 		this.vormittags = vormittags;
 		this.mittags = mittags;
 		this.patientenAnzahl = Zeitmodell.bestimmePatientenAnzahl(morgens, vormittags, mittags);
+		this.anzahlPermutationen = (int) Math.pow(3, patientenAnzahl);
 		this.generator = new Permutator(this.patientenAnzahl);
 		erstelleTermine();
 		berechneModell();
 	}
 	
 	public static int bestimmePatientenAnzahl(int morgens, int vormittags, int mittags) {
-		int n = 0;
+		int nMorgens = 0, nVormittags = 0, nMittags = 0;
 		int buff = 0;
-		n = new Double(Math.ceil(60./morgens)).intValue();
-		buff = n*morgens - 60;
-		n += Math.ceil(((double)(120 - buff))/vormittags);
-		buff = new Double(Math.ceil(((double)(120 - buff))/vormittags)).intValue() - 120;
-		n += new Double(Math.ceil(((double)(60 - buff))/mittags)).intValue();
-		return n;
+		nMorgens = new Double(Math.ceil(60./morgens)).intValue();
+		buff = nMorgens*morgens - 60;
+		nVormittags += Math.ceil(((double)(120 - buff))/vormittags);
+		buff = new Double(Math.ceil(((double)(120 - buff))/vormittags)).intValue()*vormittags - 120 + buff;
+		nMittags += new Double(Math.ceil(((double)(60 - buff))/mittags)).intValue();
+		return nMorgens + nVormittags + nMittags;
 	}
 	
 	private void erstelleTermine() {
@@ -89,10 +91,14 @@ public class Zeitmodell {
 				überhang = 0;
 			} else {
 				wz += überhang;
-				if(wz > mwz) {
-					mwz = wz;
+				if(überhang > mwz) {
+					mwz = überhang;
 				}
 			}
+		}
+		überhang += termine[patientenAnzahl-1] + dauer[patientenAnzahl-1] - 240;
+		if(überhang < 0) {
+			leer -= überhang;
 		}
 		wzKumulativ += wz; /* wird in berechneModell() durch die Anzahl der Patienten geteilt */
 		mwzKumulativ += mwz;
@@ -103,14 +109,13 @@ public class Zeitmodell {
 		wzKumulativ = 0;
 		mwzKumulativ = 0;
 		leerKumulativ = 0;
-		int anzahlPermutationen = (int) Math.pow(3, patientenAnzahl);
 		for(int i = 0; i < anzahlPermutationen - 1; ++i) {
 			erstelleDauer();
 			werteAus();
 		}
-		wz = wzKumulativ / patientenAnzahl / anzahlPermutationen;
-		mwz = mwzKumulativ / anzahlPermutationen;
-		leer = leerKumulativ / anzahlPermutationen;
+		wz = (double) wzKumulativ / patientenAnzahl / anzahlPermutationen;
+		mwz = (double) mwzKumulativ / anzahlPermutationen;
+		leer = (double) leerKumulativ / anzahlPermutationen;
 		bs = wz + 0.1*mwz + 5.*leer;
 	}
 
@@ -134,4 +139,17 @@ public class Zeitmodell {
 		return titel;
 	}
 	
+	public String getTermine() {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < patientenAnzahl; ++i) {
+			sb.append(String.format("%02d:%02d ", termine[i] / 60 + 8, termine[i] % 60));
+		}
+		sb.deleteCharAt(sb.length()-1); /* Leerzeichen am Ende entfernen */
+		return sb.toString();
+	}
+	
+	public int getAnzahlPermutationen() {
+		return anzahlPermutationen;
+	}
+
 }
