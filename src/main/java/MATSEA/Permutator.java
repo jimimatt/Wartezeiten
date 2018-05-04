@@ -32,7 +32,7 @@ public class Permutator {
 						break;
 				case 0: break;
 				default: 
-					System.out.println("Fehler in 'wandle(), switch-Block");
+					System.out.println("Fehler in 'wandle()', switch-Block");
 			}
 			++i;
 		}
