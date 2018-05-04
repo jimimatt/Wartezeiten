@@ -20,7 +20,7 @@ public class Permutator {
 		for(int i = 0; i < n; ++i) {
 			sb.append('a');
 		}
-		int zahl = this.count; 
+		int zahl = this.count;
 		int rest, i = 0;
 		while(zahl > 0) {
 			rest = zahl % 3;
