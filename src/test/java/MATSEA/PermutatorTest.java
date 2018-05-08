@@ -13,6 +13,7 @@ public class PermutatorTest {
 	@Test
 	public void testPermutator() {
 		thrown.expect(IllegalArgumentException.class);
+		@SuppressWarnings("unused")
 		Permutator permutator = new Permutator(-1);
 	}
 

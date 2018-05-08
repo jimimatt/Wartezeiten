@@ -27,14 +27,16 @@ public class PermutatorWandleTest {
 		this.expected = expectedResult;
 	}
 	
-	@Parameterized.Parameters(name= "index baseThreeInputs (0) => value 1")
+	@Parameterized.Parameters(name= "{index}: baseThreeInputs({0})={1}")
 	public static Iterable<Object[]> baseThreeInputs() {
 		return Arrays.asList(new Object[][]
 				{
+					{-1, "aaaa"},
 					{0, "aaaa"},
 					{1, "aaab"},
 					{79, "cccb"},
-					{80, "cccc"}
+					{80, "cccc"},
+					{81, "aaaa"}
 				}
 		);
 	}
@@ -42,7 +44,18 @@ public class PermutatorWandleTest {
 	@Test
 	public void testWandle() {
 		permutator.count = input;
-		assertEquals(expected, permutator.wandle());
+		if(input > 80 || input < 0) {
+			try {
+				permutator.wandle();
+				fail("Exception not thrown");
+			} catch (IllegalArgumentException i) {
+				assertTrue(true);
+			} catch (Exception e) {
+				assertTrue(e instanceof IndexOutOfBoundsException);
+			}
+		} else {
+			assertEquals(expected, permutator.wandle());
+		}
 	}
 
 }

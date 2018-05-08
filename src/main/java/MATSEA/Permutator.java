@@ -25,7 +25,7 @@ public class Permutator {
 		}
 		int zahl = this.count;
 		int rest, i = n-1;
-		while(zahl > 0) {
+		do {
 			rest = zahl % 3;
 			zahl = zahl / 3;
 			switch(rest) {
@@ -35,10 +35,10 @@ public class Permutator {
 						break;
 				case 0: break;
 				default: 
-					System.out.println("Fehler in 'wandle()', switch-Block");
+					throw new IllegalArgumentException("Permutator.count value is invalid.");
 			}
 			--i;
-		}
+		} while(zahl > 0);
 		return sb.toString();
 	}
 	
